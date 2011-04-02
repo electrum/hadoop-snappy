@@ -1,0 +1,18 @@
+Hadoop-Snappy is a project for Hadoop that provide access to Snappy compression.
+http://code.google.com/p/snappy/
+
+Usage
+=====
+1. Install Snappy.
+
+2. Build project.
+ant package
+
+3. Copy the jar file.
+cp build/hadoop_snappy-0.0.1/hadoop_snappy-0.0.1.jar <HADOOP_HOME>/lib
+
+4. Copy the native library.
+cp build/hadoop_snappy-0.0.1/lib/native/<ARCH>/* <HADOOP_HOME>/lib/native/<ARCH>/
+cp <SNAPPY_LIB_DIR>/libsnappy* <HADOOP_HOME>/lib/native/<ARCH>/
+
+5. Restart Hadoop.
