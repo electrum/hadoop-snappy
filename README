@@ -13,6 +13,13 @@ cp build/hadoop_snappy-0.0.1/hadoop_snappy-0.0.1.jar <HADOOP_HOME>/lib
 
 4. Copy the native library.
 cp build/hadoop_snappy-0.0.1/lib/native/<ARCH>/* <HADOOP_HOME>/lib/native/<ARCH>/
-cp <SNAPPY_LIB_DIR>/libsnappy* <HADOOP_HOME>/lib/native/<ARCH>/
+ln -s <SNAPPY_LIB_DIR>/libsnappy.so.1.0.1 <HADOOP_HOME>/lib/native/<ARCH>/
 
 5. Restart Hadoop.
+
+Origins
+=======
+This project is based on the hadoop-gpl-compression and the hadoop-lzo code.
+
+http://code.google.com/p/hadoop-gpl-compression
+https://github.com/kevinweil/hadoop-lzo

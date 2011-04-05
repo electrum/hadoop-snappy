@@ -227,7 +227,7 @@
       <sysproperty key="test.build.extraconf" value="${test.build.extraconf}" />
       <sysproperty key="hadoop.policy.file" value="hadoop-policy.xml"/>
       <sysproperty key="java.library.path"
-                   value="${build.native}/lib:${lib.dir}/native/${build.platform}"/>
+                   value="${build.native}/lib:${lib.dir}/native/${build.platform}:/usr/lib:/usr/local/lib"/>
       <sysproperty key="install.c++.examples" value="${install.c++.examples}"/>
       <!-- set compile.c++ in the child jvm only if it is set -->
       <syspropertyset dynamic="no">
