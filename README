@@ -15,11 +15,23 @@ cp build/hadoop_snappy-0.0.1/hadoop_snappy-0.0.1.jar <HADOOP_HOME>/lib
 cp build/hadoop_snappy-0.0.1/lib/native/<ARCH>/* <HADOOP_HOME>/lib/native/<ARCH>/
 ln -s <SNAPPY_LIB_DIR>/libsnappy.so.1.0.1 <HADOOP_HOME>/lib/native/<ARCH>/
 
-5. Restart Hadoop.
+5. Add the following key/value pairs into core-site.xml
+<property>
+<name>io.compression.codecs</name>
+<value>org.apache.hadoop.io.compress.GzipCodec,org.apache.hadoop.io.compress.DefaultCodec,org.apache.hadoop.io.compress.BZip2Codec,com.hadoop.compression.snappy.SnappyCodec</value>
+</property>
+
+6. Restart Hadoop.
+
+License
+=======
+This project is licensed under the the Apache License, Version 2.0.
 
 Origins
 =======
 This project is based on the hadoop-gpl-compression and the hadoop-lzo code.
+All authors of the LZO codebase gave permission to relicense as the Apache License 2.0.
+Thanks!
 
 http://code.google.com/p/hadoop-gpl-compression
 https://github.com/kevinweil/hadoop-lzo
