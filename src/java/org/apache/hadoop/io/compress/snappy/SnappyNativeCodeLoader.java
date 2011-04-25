@@ -1,4 +1,4 @@
-package com.hadoop.compression.snappy;
+package org.apache.hadoop.io.compress.snappy;
 
 public class SnappyNativeCodeLoader {
   private static boolean nativeCodeLoaded = false;

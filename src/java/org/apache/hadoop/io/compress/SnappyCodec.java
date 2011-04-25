@@ -1,4 +1,4 @@
-package com.hadoop.compression.snappy;
+package org.apache.hadoop.io.compress;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +13,9 @@ import org.apache.hadoop.io.compress.CompressionInputStream;
 import org.apache.hadoop.io.compress.CompressionOutputStream;
 import org.apache.hadoop.io.compress.Compressor;
 import org.apache.hadoop.io.compress.Decompressor;
+import org.apache.hadoop.io.compress.snappy.SnappyCompressor;
+import org.apache.hadoop.io.compress.snappy.SnappyDecompressor;
+import org.apache.hadoop.io.compress.snappy.SnappyNativeCodeLoader;
 
 /**
  * This class creates snappy compressors/decompressors.

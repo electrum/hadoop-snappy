@@ -1,4 +1,4 @@
-package com.hadoop.compression.snappy;
+package org.apache.hadoop.io.compress.snappy;
 
 import java.io.IOException;
 import java.nio.Buffer;

@@ -18,7 +18,7 @@ ln -s <SNAPPY_LIB_DIR>/libsnappy.so.1.0.1 <HADOOP_HOME>/lib/native/<ARCH>/
 5. Add the following key/value pairs into core-site.xml
 <property>
 <name>io.compression.codecs</name>
-<value>org.apache.hadoop.io.compress.GzipCodec,org.apache.hadoop.io.compress.DefaultCodec,org.apache.hadoop.io.compress.BZip2Codec,com.hadoop.compression.snappy.SnappyCodec</value>
+<value>org.apache.hadoop.io.compress.GzipCodec,org.apache.hadoop.io.compress.DefaultCodec,org.apache.hadoop.io.compress.BZip2Codec,org.apache.hadoop.io.compress.SnappyCodec</value>
 </property>
 
 6. Restart Hadoop.

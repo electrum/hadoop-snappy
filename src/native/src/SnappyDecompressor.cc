@@ -1,4 +1,4 @@
-#include "com_hadoop_compression_snappy_SnappyDecompressor.h"
+#include "org_apache_hadoop_io_compress_snappy_SnappyDecompressor.h"
 #include "hadoop_snappy.h"
 #include <snappy.h>
 #include <stdlib.h>
@@ -8,7 +8,7 @@ static jfieldID SnappyDecompressor_compressedDirectBuf;
 static jfieldID SnappyDecompressor_compressedDirectBufLen;
 static jfieldID SnappyDecompressor_uncompressedDirectBuf;
 
-JNIEXPORT void JNICALL Java_com_hadoop_compression_snappy_SnappyDecompressor_initIDs
+JNIEXPORT void JNICALL Java_org_apache_hadoop_io_compress_snappy_SnappyDecompressor_initIDs
 (JNIEnv *env, jclass clazz){
   SnappyDecompressor_clazz = env->GetStaticFieldID(clazz, "clazz",
                                                    "Ljava/lang/Class;");
@@ -22,7 +22,7 @@ JNIEXPORT void JNICALL Java_com_hadoop_compression_snappy_SnappyDecompressor_ini
                                                              "Ljava/nio/Buffer;");
 }
 
-JNIEXPORT jint JNICALL Java_com_hadoop_compression_snappy_SnappyDecompressor_decompressBytesDirect
+JNIEXPORT jint JNICALL Java_org_apache_hadoop_io_compress_snappy_SnappyDecompressor_decompressBytesDirect
 (JNIEnv *env, jobject thisj){
   // Get members of SnappyDecompressor
   jclass c = env->GetObjectClass(thisj);

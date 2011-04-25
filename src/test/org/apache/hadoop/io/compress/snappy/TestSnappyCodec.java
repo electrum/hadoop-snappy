@@ -1,4 +1,4 @@
-package com.hadoop.compression.snappy;
+package org.apache.hadoop.io.compress.snappy;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,6 +14,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.CompressionInputStream;
 import org.apache.hadoop.io.compress.CompressionOutputStream;
+import org.apache.hadoop.io.compress.SnappyCodec;
 import org.apache.hadoop.util.ReflectionUtils;
 
 public class TestSnappyCodec extends TestCase {
