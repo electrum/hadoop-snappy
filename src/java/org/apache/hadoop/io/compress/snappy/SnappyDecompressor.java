@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.compress.Decompressor;
 
 /**
@@ -11,9 +13,12 @@ import org.apache.hadoop.io.compress.Decompressor;
  * http://code.google.com/p/snappy/
  */
 public class SnappyDecompressor implements Decompressor {
+  private static final Log LOG = 
+    LogFactory.getLog(SnappyCompressor.class.getName());
   private static final int DEFAULT_DIRECT_BUFFER_SIZE = 64 * 1024;
   
   // HACK - Use this as a global lock in the JNI layer
+  @SuppressWarnings({ "unchecked", "unused" })
   private static Class clazz = SnappyDecompressor.class;
 
   private int directBufferSize;
@@ -33,8 +38,14 @@ public class SnappyDecompressor implements Decompressor {
         initIDs();
         nativeSnappyLoaded = true;
       } catch (Throwable t) {
-        // Ignore failure
+        // Ignore failure to load/initialize snappy
+        LOG.warn(t.toString());
+        nativeSnappyLoaded = false;
       }
+    } else {
+      LOG.error("Cannot load " + SnappyDecompressor.class.getName() + 
+      " without snappy library!");
+      nativeSnappyLoaded = false;
     }
   }
   

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.compress.Compressor;
 
@@ -12,9 +14,12 @@ import org.apache.hadoop.io.compress.Compressor;
  * http://code.google.com/p/snappy/
  */
 public class SnappyCompressor implements Compressor {
+  private static final Log LOG = 
+    LogFactory.getLog(SnappyCompressor.class.getName());
   private static final int DEFAULT_DIRECT_BUFFER_SIZE = 64 * 1024;
 
   // HACK - Use this as a global lock in the JNI layer
+  @SuppressWarnings({ "unchecked", "unused" })
   private static Class clazz = SnappyCompressor.class;
 
   private int directBufferSize;
@@ -37,8 +42,14 @@ public class SnappyCompressor implements Compressor {
         initIDs();
         nativeSnappyLoaded = true;
       } catch (Throwable t) {
-        // Ignore failure
+        // Ignore failure to load/initialize snappy
+        LOG.warn(t.toString());
+        nativeSnappyLoaded = false;
       }
+    } else {
+      LOG.error("Cannot load " + SnappyCompressor.class.getName() + 
+      " without snappy library!");
+      nativeSnappyLoaded = false;
     }
   }
   
@@ -140,7 +151,7 @@ public class SnappyCompressor implements Compressor {
       throw new ArrayIndexOutOfBoundsException();
     }
 
-    // Check if there is uncompressed data
+    // Check if there is compressed data
     int n = compressedDirectBuf.remaining();
     if (n > 0) {
       n = Math.min(n, len);
