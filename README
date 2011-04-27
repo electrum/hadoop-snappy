@@ -1,6 +1,8 @@
 Hadoop-Snappy is a project for Hadoop that provide access to Snappy compression.
 http://code.google.com/p/snappy/
 
+This project is preparing to integrate the code into Hadoop Common.
+
 Usage
 =====
 1. Install Snappy.
@@ -29,8 +31,9 @@ This project is licensed under the the Apache License, Version 2.0.
 
 Origins
 =======
-This project is based on the hadoop-gpl-compression and the hadoop-lzo code.
-All authors of the LZO codebase gave permission to relicense as the Apache License 2.0.
+This project is based on the Hadoop LZO codec classes.
+The authors of the Hadoop LZO codec classes gave permission to relicense as the Apache License 2.0.
+(Todd Lipcon, Kevin Weil, Owen O'Malley, Hong Tang, Chris Douglas, Arun C Murthy)
 Thanks!
 
 http://code.google.com/p/hadoop-gpl-compression
