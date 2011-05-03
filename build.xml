@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <project name="Hadoop-Snappy-Compression" default="compile">
   <property name="Name" value="Hadoop Snappy Compression"/>
-  <property name="name" value="hadoop_snappy"/>
+  <property name="name" value="hadoop-snappy"/>
   <property name="version" value="0.0.1"/>
   <property name="final.name" value="${name}-${version}"/>
   
