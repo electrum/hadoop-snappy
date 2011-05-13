@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+ACLOCAL_AMFLAGS = -I m4
 
 AM_CPPFLAGS = @JNI_CPPFLAGS@ -I$(HADOOP_NATIVE_SRCDIR)/src
 AM_LDFLAGS = @JNI_LDFLAGS@

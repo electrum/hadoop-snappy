@@ -20,7 +20,7 @@ The build tarball is at target/hadoop-snappy-0.0.1-distro.tar.gz
 Install Hadoop Snappy in Hadoop
 =====
 
-1. Expand hadoop-snappy-0.0.1-distro.tar.gz file
+1. Expand hadoop-snappy-0.0.1-SNAPSHOT-distro.tar.gz file
 
 Copy (recursively) the lib directory of the expanded tarball in 
 the <HADOOP_HOME>/lib of all Hadoop nodes

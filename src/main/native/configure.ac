@@ -22,7 +22,10 @@
 AC_PREREQ(2.59)
 AC_INIT(hadoop-snappy, 0.0.1, issaymk2@gmail.com)
 AC_CONFIG_SRCDIR([src/SnappyCompressor.cc])
+AC_CONFIG_AUX_DIR([config])
+AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADER([config.h])
+AC_SYS_LARGEFILE
 AM_INIT_AUTOMAKE([subdir-objects foreign no-dist])
 
 # Checks for programs.
@@ -52,7 +55,7 @@ JNI_LDFLAGS="-L$JAVA_HOME/jre/lib/$OS_ARCH/server"
 fi
 ldflags_bak=$LDFLAGS
 LDFLAGS="$LDFLAGS $JNI_LDFLAGS"
-AC_CHECK_LIB([jvm], [JNI_GetCreatedJavaVMs], [snappy])
+AC_CHECK_LIB([jvm], [JNI_GetCreatedJavaVMs])
 LDFLAGS=$ldflags_bak
 AC_SUBST([JNI_LDFLAGS])
 

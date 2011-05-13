@@ -16,7 +16,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.hadoop</groupId>
     <artifactId>hadoop-snappy</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Hadoop Snappy</name>
     <description>Hadoop Snappy</description>
@@ -150,6 +150,15 @@
                                 <!-- COMPILE NATIVE CODE -->
                                 <mkdir dir="${project.build.directory}/native/lib"/>
                                 <property name="snappy.lib" value=""/>
+
+                                <mkdir dir="${basedir}/src/main/native/config"/>
+                                <mkdir dir="${basedir}/src/main/native/m4"/>
+                                
+                                <exec executable="autoreconf" dir="${basedir}/src/main/native"
+                                      searchpath="yes" failonerror="yes">
+                                  <arg value="-i"/>
+                                  <arg value="-f"/>
+                                </exec>        
 
                                 <exec dir="${project.build.directory}/native" executable="sh" failonerror="true">
                                     <env key="OS_NAME" value="${os.name}"/>
