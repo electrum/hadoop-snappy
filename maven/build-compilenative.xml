@@ -58,6 +58,22 @@
             <arg line="configure ${native.configure.options}"/>
         </exec>
 
+        <!-- TODO: find the correct way of disabling RPATH when running configure -->
+
+        <!-- Deactivate rpath -->
+        <exec dir="${native.staging.dir}" executable="sed" failonerror="true">
+            <arg value="-ibak"/>
+            <arg value="s/^hardcode_libdir_flag_spec=.*/hardcode_libdir_flag_spec=/g"/>
+            <arg value="libtool"/>
+        </exec>
+
+        <!-- Deactivate rpath -->
+        <exec dir="${native.staging.dir}" executable="sed" failonerror="true">
+            <arg value="-ibak"/>
+            <arg value="s/^runpath_var=LD_RUN_PATH/runpath_var=DIE_RPATH_DIE/g"/>
+            <arg value="libtool"/>
+        </exec>
+
         <!-- invoking make install in staging dir with destination dir to ${native.build.dir} -->
         <exec dir="${native.staging.dir}" executable="make" failonerror="true">
             <env key="OS_NAME" value="${os.name}"/>
