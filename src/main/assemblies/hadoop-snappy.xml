@@ -12,10 +12,9 @@
   limitations under the License. See accompanying LICENSE file.
 -->
 <assembly>
-    <id>distro</id>
+    <id>tar</id>
     <formats>
         <format>dir</format>
-        <format>tar.gz</format>
     </formats>
     <includeBaseDirectory>true</includeBaseDirectory>
     <baseDirectory>hadoop-snappy-${project.version}</baseDirectory>
@@ -28,22 +27,6 @@
                 <include>pom.xml</include>
                 <include>LICENSE.txt</include>
                 <include>README.txt</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${snappy.lib}/usr/local/lib</directory>
-            <outputDirectory>/lib/native/${build.platform}</outputDirectory>
-            <includes>
-                <include>libsnappy.so</include>
-                <include>libsnappy.dylib</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${project.build.directory}/native/lib</directory>
-            <outputDirectory>/lib/native/${build.platform}</outputDirectory>
-            <includes>
-                <include>libhadoopsnappy.so</include>
-                <include>libhadoopsnappy.dylib</include>
             </includes>
         </fileSet>
     </fileSets>

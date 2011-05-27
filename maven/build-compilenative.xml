@@ -1,0 +1,70 @@
+<project name="compile native" default="compilenative">
+
+    <!-- COMPILE NATIVE CODE -->
+    <!--
+      Description: runs configure and make install.
+
+      Activation property:
+        native.compile=true
+
+      Required properties (normal values):
+        maven.src.dir=${basedir}
+        maven.build.dir=${project.build.directory}
+
+      Optional properties (default value):
+        native.configure.options=
+        native.make.options=
+
+    -->
+
+    <target name="checkpreconditions">
+        <condition property="preconditions.met">
+            <and>
+                <isset property="maven.src.dir"/>
+                <isset property="maven.build.dir"/>
+            </and>
+        </condition>
+        <fail unless="preconditions.met"/>
+    </target>
+
+    <target name="compilenative" depends="checkpreconditions" if="native.compile">
+        <property name="native.src.dir" value="${maven.src.dir}/src/main/native"/>
+        <property name="native.staging.dir" value="${maven.build.dir}/native-src"/>
+        <property name="native.build.dir" value="${maven.build.dir}/native-build"/>
+        <property name="native.configure.options" value=""/>
+        <property name="native.make.options" value=""/>
+
+        <!-- making sure Maven build dir exists -->
+        <mkdir dir="${maven.build.dir}"/>
+
+        <!-- copying native source to staging, using Unix cp to ensure permissions preservation -->
+        <exec executable="cp" failonerror="true">
+            <arg line="-r ${native.src.dir} ${native.staging.dir}"/>
+        </exec>
+
+        <mkdir dir="${native.staging.dir}/config"/>
+        <mkdir dir="${native.staging.dir}/m4"/>
+
+        <exec executable="autoreconf" dir="${native.staging.dir}"
+              searchpath="yes" failonerror="yes">
+          <arg value="-i"/>
+          <arg value="-f"/>
+        </exec>
+
+        <exec dir="${native.staging.dir}" executable="sh" failonerror="true">
+            <env key="OS_NAME" value="${os.name}"/>
+            <env key="OS_ARCH" value="${os.arch}"/>
+            <env key="JVM_DATA_MODEL" value="${sun.arch.data.model}"/>
+            <arg line="configure ${native.configure.options}"/>
+        </exec>
+
+        <!-- invoking make install in staging dir with destination dir to ${native.build.dir} -->
+        <exec dir="${native.staging.dir}" executable="make" failonerror="true">
+            <env key="OS_NAME" value="${os.name}"/>
+            <env key="OS_ARCH" value="${os.arch}"/>
+            <env key="JVM_DATA_MODEL" value="${sun.arch.data.model}"/>
+            <arg line="install DESTDIR=${native.build.dir} ${native.make.options}"/>
+        </exec>
+    </target>
+
+</project>

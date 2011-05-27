@@ -32,6 +32,7 @@
         <snappy.lib></snappy.lib>
 
         <build.platform>${os.name}-${os.arch}-${sun.arch.data.model}</build.platform>
+        <nativelib.ext>so</nativelib.ext>
 
         <!-- platform encoding override -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -39,6 +40,13 @@
 
         <test.exclude></test.exclude>
         <test.exclude.pattern></test.exclude.pattern>
+
+        <packaging.native.lib.dir>${project.build.directory}/${project.artifactId}-${project.version}/${project.artifactId}-${project.version}/lib/native/${build.platform}</packaging.native.lib.dir>
+
+        <libsnappy.native.fullversion>1.1.0</libsnappy.native.fullversion>
+        <libsnappy.native.shortversion>1</libsnappy.native.shortversion>
+        <libhadoopsnappy.native.fullversion>0.0.1</libhadoopsnappy.native.fullversion>
+        <libhadoopsnappy.native.shortversion>0</libhadoopsnappy.native.shortversion>
     </properties>
 
     <dependencies>
@@ -147,36 +155,54 @@
                         </goals>
                         <configuration>
                             <target>
-                                <!-- COMPILE NATIVE CODE -->
-                                <mkdir dir="${project.build.directory}/native/lib"/>
-                                <property name="snappy.lib" value=""/>
 
-                                <mkdir dir="${basedir}/src/main/native/config"/>
-                                <mkdir dir="${basedir}/src/main/native/m4"/>
-                                
-                                <exec executable="autoreconf" dir="${basedir}/src/main/native"
-                                      searchpath="yes" failonerror="yes">
-                                  <arg value="-i"/>
-                                  <arg value="-f"/>
-                                </exec>        
+                                <condition property="snappy.found">
+                                    <resourceexists>
+                                        <file file="${snappy.lib}/usr/local/lib/libsnappy.${nativelib.ext}"/>
+                                    </resourceexists>
+                                </condition>
+                                <fail unless="snappy.found">Snappy native library not found, use -Dsnappy.lib=PATH</fail>
 
-                                <exec dir="${project.build.directory}/native" executable="sh" failonerror="true">
-                                    <env key="OS_NAME" value="${os.name}"/>
-                                    <env key="OS_ARCH" value="${os.arch}"/>
-                                    <env key="JVM_DATA_MODEL" value="${sun.arch.data.model}"/>
-                                    <env key="NATIVE_SRCDIR" value="${basedir}/src/main/native"/>
-                                    <arg line="${basedir}/src/main/native/configure CPPFLAGS=-I${snappy.lib}/usr/local/include LDFLAGS=-L${snappy.lib}/usr/local/lib"/>
-                                </exec>
+                                <property name="native.compile" value="true"/>
+                                <property name="native.configure.options"
+                                          value="CPPFLAGS=-I${snappy.lib}/usr/local/include LDFLAGS=-L${snappy.lib}/usr/local/lib"/>
 
-                                <exec dir="${project.build.directory}/native" executable="make" failonerror="true">
-                                    <env key="OS_NAME" value="${os.name}"/>
-                                    <env key="OS_ARCH" value="${os.arch}"/>
-                                    <env key="JVM_DATA_MODEL" value="${sun.arch.data.model}"/>
-                                    <env key="HADOOP_NATIVE_SRCDIR" value="${basedir}/src/main/native"/>
-                                </exec>
+                                <property name="maven.src.dir" value="${basedir}"/>
+                                <property name="maven.build.dir" value="${project.build.directory}"/>
 
-                                <exec dir="${project.build.directory}/native" executable="sh" failonerror="true">
-                                    <arg line="${project.build.directory}/native/libtool --mode=install cp ${project.build.directory}/native/libhadoopsnappy.la ${project.build.directory}/native/lib"/>
+                                <ant antfile="${basedir}/maven/build-compilenative.xml"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>package</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <property name="native.assembly" value="true"/>
+                                <property name="maven.build.dir" value="${project.build.directory}"/>
+                                <property name="maven.assembly.dir"
+                                          value="${project.build.directory}/${project.artifactId}-${project.version}-tar/${project.artifactId}-${project.version}"/>
+                                <property name="maven.assembly.name" value="${project.artifactId}-${project.version}"/>
+                                <property name="native.build.platform" value="${build.platform}"/>
+
+                                <ant antfile="${basedir}/maven/build-assemblynative.xml"/>
+
+                                <!-- dragging snappy so files into the tar -->
+                                <property name="native.assembly.dontclean" value="true"/>
+                                <property name="native.build.dir" value="${snappy.lib}"/>
+                                <ant antfile="${basedir}/maven/build-assemblynative.xml"/>
+
+                                <!-- Using Unix tar to preserve symlinks -->
+                                <exec executable="tar"
+                                      dir="${project.build.directory}/${project.artifactId}-${project.version}-tar/"
+                                      failonerror="yes">
+                                    <arg value="czf"/>
+                                    <arg value="${project.build.directory}/${project.artifactId}-${project.version}.tar.gz"/>
+                                    <arg value="."/>
                                 </exec>
                             </target>
                         </configuration>
@@ -189,10 +215,10 @@
                 <configuration>
                     <forkMode>once</forkMode>
                     <environmentVariables>
-                        <LD_LIBRARY_PATH>${env.LD_LIBRARY_PATH}:${snappy.lib}/usr/local/lib:${project.build.directory}/native/lib</LD_LIBRARY_PATH>
+                        <LD_LIBRARY_PATH>${env.LD_LIBRARY_PATH}:${snappy.lib}/usr/local/lib:${project.build.directory}/native-build/usr/local/lib</LD_LIBRARY_PATH>
 
                         <!-- For Mac OS X -->
-                        <DYLD_LIBRARY_PATH>${env.DYLD_LIBRARY_PATH}:${snappy.lib}/usr/local/lib:${project.build.directory}/native/lib</DYLD_LIBRARY_PATH>
+                        <DYLD_LIBRARY_PATH>${env.DYLD_LIBRARY_PATH}:${snappy.lib}/usr/local/lib:${project.build.directory}/native-build/usr/local/lib</DYLD_LIBRARY_PATH>
                     </environmentVariables>
                     <excludes>
                         <exclude>**/${test.exclude}.java</exclude>
@@ -213,6 +239,7 @@
             </activation>
             <properties>
                 <build.platform>Mac_OS_X-${sun.arch.data.model}</build.platform>
+                <nativelib.ext>dylib</nativelib.ext>
             </properties>
         </profile>
     </profiles>

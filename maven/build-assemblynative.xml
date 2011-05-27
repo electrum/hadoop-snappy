@@ -1,0 +1,56 @@
+<project name="assembly native" default="assemblynative">
+
+    <!-- ASSEMBLY NATIVE CODE, keeping native libs symlinks -->
+    <!--
+      Description: runs after assembly ('dir' format) to keep native lib symlinks.
+
+      Activation property:
+        native.assembly=true
+
+      Required properties (normal values):
+        maven.build.dir=${project.build.directory}
+        maven.assembly.dir=${project.build.directory}/${project.artifactId}-${project.version}
+        maven.assembly.name=${project.artifactId}-${project.version}
+        native.build.platform=${build.platform}
+
+      Optional properties (default values):
+        native.build.dir=${maven.build.dir}/native-build
+        native.assembly.dontclean=true
+    -->
+
+    <target name="checkpreconditions">
+        <condition property="preconditions.met">
+            <and>
+                <isset property="maven.build.dir"/>
+                <isset property="maven.assembly.dir"/>
+                <isset property="maven.assembly.name"/>
+            </and>
+        </condition>
+        <fail unless="preconditions.met"/>
+    </target>
+
+    <target name="cleanuppreviousrun" unless="native.assembly.dontclean">
+        <delete dir="${native.assembly.lib.dir}/${native.build.platform}"/>
+    </target>
+
+    <target name="assemblynative" depends="checkpreconditions,cleanuppreviousrun" if="native.assembly">
+        <property name="native.build.dir" value="${maven.build.dir}/native-build"/>
+        <property name="native.assembly.lib.dir" value="${maven.assembly.dir}/lib/native"/>
+
+        <mkdir dir="${native.assembly.lib.dir}/${native.build.platform}"/>
+
+        <!-- Using Unix cp to preserve symlinks, using script to handle wildcards -->
+        <echo file="${maven.build.dir}/copynativelibs.sh">
+            cp -a ${native.build.dir}/usr/local/lib/* ${native.assembly.lib.dir}/${native.build.platform}
+        </echo>
+        <exec executable="sh" dir="${maven.build.dir}" failonerror="true">
+            <arg line="./copynativelibs.sh"/>
+        </exec>
+
+        <!-- Deleting non dynamic lib files -->
+        <delete>
+            <fileset dir="${native.assembly.lib.dir}/${native.build.platform}" includes="*.*a"/>
+        </delete>
+    </target>
+
+</project>
