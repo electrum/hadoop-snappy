@@ -6,7 +6,8 @@ This project is preparing to integrate the code into Hadoop Common.
 
 Build Hadoop Snappy
 =====
-1. Requirements: gcc c++, libtool, Java 6, JAVA_HOME set, Maven 3
+1. Requirements: gcc c++, autoconf, automake, libtool, Java 6, 
+                 JAVA_HOME set, Maven 3
 
 2. Build/install Snappy (http://code.google.com/p/snappy/)
 
@@ -14,21 +15,21 @@ Build Hadoop Snappy
 
   $ mvn package
 
-The build tarball is at target/hadoop-snappy-0.0.1-distro.tar.gz 
+The built tarball is at target/hadoop-snappy-0.0.1-SNAPSHOT.tar.gz 
 
  
 Install Hadoop Snappy in Hadoop
 =====
 
-1. Expand hadoop-snappy-0.0.1-SNAPSHOT-distro.tar.gz file
+1. Expand hadoop-snappy-0.0.1-SNAPSHOT.tar.gz file
 
 Copy (recursively) the lib directory of the expanded tarball in 
 the <HADOOP_HOME>/lib of all Hadoop nodes
 
-  $ cp -r hadoop-snappy-0.0.1/lib/* <HADOOP_HOME>/lib
+  $ cp -r hadoop-snappy-0.0.1-SNAPSHOT/lib/* <HADOOP_HOME>/lib
 
-IMPORTANT: Hadoo Snappy 0.0.1 tarball includes Snappy native 
-library (there is no need to install it the Hadoop nodes)
+IMPORTANT: Hadoo Snappy 0.0.1-SNAPSHOT tarball includes Snappy native 
+library.
 
 2. Add the following key/value pairs into core-site.xml
 
@@ -47,6 +48,7 @@ library (there is no need to install it the Hadoop nodes)
 License
 =======
 Hadoop Snappy is licensed under the the Apache License, Version 2.0.
+Snappy is licensed under the the Apache License, Version 2.0.
 
 Origins
 =======

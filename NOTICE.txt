@@ -1,0 +1,6 @@
+Hadoop Snappy uses and includes Snappy 1.0.2
+
+   http://code.google.com/p/snappy
+
+Snappy 1.0.2 is licensed under Apache 2.0 License
+
