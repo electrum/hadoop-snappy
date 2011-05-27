@@ -43,6 +43,9 @@
 
         <packaging.native.lib.dir>${project.build.directory}/${project.artifactId}-${project.version}/${project.artifactId}-${project.version}/lib/native/${build.platform}</packaging.native.lib.dir>
 
+        <!-- Used for specific Linux distros (ie: -lucid) -->
+        <os.distro.classifier></os.distro.classifier>
+        
         <libsnappy.native.fullversion>1.1.0</libsnappy.native.fullversion>
         <libsnappy.native.shortversion>1</libsnappy.native.shortversion>
         <libhadoopsnappy.native.fullversion>0.0.1</libhadoopsnappy.native.fullversion>
@@ -204,7 +207,39 @@
                                     <arg value="${project.build.directory}/${project.artifactId}-${project.version}.tar.gz"/>
                                     <arg value="."/>
                                 </exec>
+
+                                <!-- Using Unix tar to preserve symlinks -->
+                                <exec executable="tar"
+                                      dir="${project.build.directory}/${project.artifactId}-${project.version}-tar/${project.artifactId}-${project.version}/lib/native/${build.platform}"
+                                      failonerror="yes">
+                                    <arg value="cf"/>
+                                    <arg value="${project.build.directory}/${project.artifactId}-${project.version}-${build.platform}.tar"/>
+                                    <arg value="."/>
+                                </exec>
                             </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>abc</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attach-artifact</goal>
+                        </goals>
+                        <configuration>
+                            <artifacts>
+                                <artifact>
+                                    <file>${project.build.directory}/${project.artifactId}-${project.version}-${build.platform}.tar</file>
+                                    <type>tar</type>
+                                    <classifier>${build.platform}${os.distro.classifier}</classifier>
+                                </artifact>
+                            </artifacts>
                         </configuration>
                     </execution>
                 </executions>
