@@ -97,7 +97,7 @@ public class SnappyDecompressor implements Decompressor {
     this(DEFAULT_DIRECT_BUFFER_SIZE);
   }
 
-  public synchronized void setInput(byte[] b, int off, int len) {
+  public void setInput(byte[] b, int off, int len) {
     if (b == null) {
       throw new NullPointerException();
     }
@@ -121,7 +121,7 @@ public class SnappyDecompressor implements Decompressor {
    * aside to be loaded by this function while the compressed data are
    * consumed.
    */
-  synchronized void setInputFromSavedData() {
+  void setInputFromSavedData() {
     compressedDirectBufLen = Math.min(userBufLen, directBufferSize);
 
     // Reinitialize snappy's input direct buffer
@@ -134,11 +134,11 @@ public class SnappyDecompressor implements Decompressor {
     userBufLen -= compressedDirectBufLen;
   }
 
-  public synchronized void setDictionary(byte[] b, int off, int len) {
+  public void setDictionary(byte[] b, int off, int len) {
     // do nothing
   }
 
-  public synchronized boolean needsInput() {
+  public boolean needsInput() {
     // Consume remaining compressed data?
     if (uncompressedDirectBuf.remaining() > 0) {
       return false;
@@ -157,15 +157,15 @@ public class SnappyDecompressor implements Decompressor {
     return false;
   }
 
-  public synchronized boolean needsDictionary() {
+  public boolean needsDictionary() {
     return false;
   }
 
-  public synchronized boolean finished() {
+  public boolean finished() {
     return (finished && uncompressedDirectBuf.remaining() == 0);
   }
 
-  public synchronized int decompress(byte[] b, int off, int len)
+  public int decompress(byte[] b, int off, int len)
       throws IOException {
     if (b == null) {
       throw new NullPointerException();
@@ -204,7 +204,7 @@ public class SnappyDecompressor implements Decompressor {
     return n;
   }
 
-  public synchronized void reset() {
+  public void reset() {
     finished = false;
     compressedDirectBufLen = 0;
     uncompressedDirectBuf.limit(directBufferSize);
@@ -212,7 +212,7 @@ public class SnappyDecompressor implements Decompressor {
     userBufOff = userBufLen = 0;
   }
 
-  public synchronized void end() {
+  public void end() {
     // do nothing
   }
 

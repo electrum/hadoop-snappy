@@ -100,7 +100,7 @@ public class SnappyCompressor implements Compressor {
     this(DEFAULT_DIRECT_BUFFER_SIZE);
   }
 
-  public synchronized void setInput(byte[] b, int off, int len) {
+  public void setInput(byte[] b, int off, int len) {
     if (b == null) {
       throw new NullPointerException();
     }
@@ -127,7 +127,7 @@ public class SnappyCompressor implements Compressor {
    * aside to be loaded by this function while the compressed data are
    * consumed.
    */
-  synchronized void setInputFromSavedData() {
+  void setInputFromSavedData() {
     if (0 >= userBufLen) {
       return;
     }
@@ -142,25 +142,25 @@ public class SnappyCompressor implements Compressor {
     userBufLen -= uncompressedDirectBufLen;
   }
 
-  public synchronized void setDictionary(byte[] b, int off, int len) {
+  public void setDictionary(byte[] b, int off, int len) {
     // do nothing
   }
 
-  public synchronized boolean needsInput() {
+  public boolean needsInput() {
     return !(compressedDirectBuf.remaining() > 0
         || uncompressedDirectBuf.remaining() == 0 || userBufLen > 0);
   }
 
-  public synchronized void finish() {
+  public void finish() {
     finish = true;
   }
 
-  public synchronized boolean finished() {
+  public boolean finished() {
     // Check if all uncompressed data has been consumed
     return (finish && finished && compressedDirectBuf.remaining() == 0);
   }
 
-  public synchronized int compress(byte[] b, int off, int len)
+  public int compress(byte[] b, int off, int len)
       throws IOException {
     if (b == null) {
       throw new NullPointerException();
@@ -209,7 +209,7 @@ public class SnappyCompressor implements Compressor {
     return n;
   }
 
-  public synchronized void reset() {
+  public void reset() {
     finish = false;
     finished = false;
     uncompressedDirectBuf.clear();
@@ -220,25 +220,25 @@ public class SnappyCompressor implements Compressor {
     bytesRead = bytesWritten = 0L;
   }
 
-  public synchronized void reinit(Configuration conf) {
+  public void reinit(Configuration conf) {
     reset();
   }
   
   /**
    * Return number of bytes given to this compressor since last reset.
    */
-  public synchronized long getBytesRead() {
+  public long getBytesRead() {
     return bytesRead;
   }
   
   /**
    * Return number of bytes consumed by callers of compress since last reset.
    */
-  public synchronized long getBytesWritten() {
+  public long getBytesWritten() {
     return bytesWritten;
   }
 
-  public synchronized void end() {
+  public void end() {
   }
 
   private native static void initIDs();
