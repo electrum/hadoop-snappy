@@ -23,6 +23,7 @@
             <directory>${basedir}</directory>
             <outputDirectory>/src</outputDirectory>
             <includes>
+                <include>maven/**</include>
                 <include>src/**</include>
                 <include>pom.xml</include>
                 <include>LICENSE.txt</include>
