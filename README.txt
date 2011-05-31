@@ -4,6 +4,7 @@ Hadoop-Snappy enables Snappy compression for Hadoop.
 
 This project is preparing to integrate the code into Hadoop Common.
 
+
 Build Hadoop Snappy
 =====
 1. Requirements: gcc c++, autoconf, automake, libtool, Java 6, 
@@ -13,11 +14,15 @@ Build Hadoop Snappy
 
 3. Build Hadoop Snappy
 
-  $ mvn package
+  $ mvn package [-Dsnappy.prefix=SNAPPY_INSTALLATION_DIR]
 
-The built tarball is at target/hadoop-snappy-0.0.1-SNAPSHOT.tar.gz 
+'snappy.prefix' by default is '/usr/local'. If Snappy is installed in
+other location than user local set 'snappy.prefix' to the right location.
 
- 
+The built tarball is at target/hadoop-snappy-0.0.1-SNAPSHOT.tar.gz. The
+tarball includes snappy native library
+
+
 Install Hadoop Snappy in Hadoop
 =====
 
@@ -45,10 +50,12 @@ library.
 
 3. Restart Hadoop.
 
+
 License
 =======
 Hadoop Snappy is licensed under the the Apache License, Version 2.0.
 Snappy is licensed under the the Apache License, Version 2.0.
+
 
 Origins
 =======

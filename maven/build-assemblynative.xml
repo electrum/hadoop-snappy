@@ -34,14 +34,14 @@
     </target>
 
     <target name="assemblynative" depends="checkpreconditions,cleanuppreviousrun" if="native.assembly">
-        <property name="native.build.dir" value="${maven.build.dir}/native-build"/>
+        <property name="native.build.dir" value="${maven.build.dir}/native-build/usr/local/lib"/>
         <property name="native.assembly.lib.dir" value="${maven.assembly.dir}/lib/native"/>
 
         <mkdir dir="${native.assembly.lib.dir}/${native.build.platform}"/>
 
         <!-- Using Unix cp to preserve symlinks, using script to handle wildcards -->
         <echo file="${maven.build.dir}/copynativelibs.sh">
-            cp -a ${native.build.dir}/usr/local/lib/* ${native.assembly.lib.dir}/${native.build.platform}
+            cp -a ${native.build.dir}/* ${native.assembly.lib.dir}/${native.build.platform}
         </echo>
         <exec executable="sh" dir="${maven.build.dir}" failonerror="true">
             <arg line="./copynativelibs.sh"/>

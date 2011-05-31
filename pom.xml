@@ -29,9 +29,11 @@
     </licenses>
 
     <properties>
-        <snappy.lib></snappy.lib>
+      <snappy.prefix>/usr/local</snappy.prefix>
+      <snappy.lib>${snappy.prefix}/lib</snappy.lib>
+      <snappy.include>${snappy.prefix}/include</snappy.include>
 
-        <build.platform>${os.name}-${os.arch}-${sun.arch.data.model}</build.platform>
+      <build.platform>${os.name}-${os.arch}-${sun.arch.data.model}</build.platform>
         <nativelib.ext>so</nativelib.ext>
 
         <!-- platform encoding override -->
@@ -161,14 +163,14 @@
 
                                 <condition property="snappy.found">
                                     <resourceexists>
-                                        <file file="${snappy.lib}/usr/local/lib/libsnappy.${nativelib.ext}"/>
+                                        <file file="${snappy.lib}/libsnappy.${nativelib.ext}"/>
                                     </resourceexists>
                                 </condition>
-                                <fail unless="snappy.found">Snappy native library not found, use -Dsnappy.lib=PATH</fail>
+                                <fail unless="snappy.found">Snappy native library not found at ${snappy.lib}, use -Dsnappy.path=PATH</fail>
 
                                 <property name="native.compile" value="true"/>
                                 <property name="native.configure.options"
-                                          value="CPPFLAGS=-I${snappy.lib}/usr/local/include LDFLAGS=-L${snappy.lib}/usr/local/lib"/>
+                                          value="CPPFLAGS=-I${snappy.include} LDFLAGS=-L${snappy.lib}"/>
 
                                 <property name="maven.src.dir" value="${basedir}"/>
                                 <property name="maven.build.dir" value="${project.build.directory}"/>
@@ -250,10 +252,10 @@
                 <configuration>
                     <forkMode>once</forkMode>
                     <environmentVariables>
-                        <LD_LIBRARY_PATH>${env.LD_LIBRARY_PATH}:${snappy.lib}/usr/local/lib:${project.build.directory}/native-build/usr/local/lib</LD_LIBRARY_PATH>
+                        <LD_LIBRARY_PATH>${env.LD_LIBRARY_PATH}:${snappy.lib}:${project.build.directory}/native-build/usr/local/lib</LD_LIBRARY_PATH>
 
                         <!-- For Mac OS X -->
-                        <DYLD_LIBRARY_PATH>${env.DYLD_LIBRARY_PATH}:${snappy.lib}/usr/local/lib:${project.build.directory}/native-build/usr/local/lib</DYLD_LIBRARY_PATH>
+                        <DYLD_LIBRARY_PATH>${env.DYLD_LIBRARY_PATH}:${snappy.lib}:${project.build.directory}/native-build/usr/local/lib</DYLD_LIBRARY_PATH>
                     </environmentVariables>
                     <excludes>
                         <exclude>**/${test.exclude}.java</exclude>
