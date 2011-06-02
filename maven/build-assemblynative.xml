@@ -54,7 +54,7 @@
 
         <!-- Using Unix cp to preserve symlinks, using script to handle wildcards -->
         <echo file="${maven.build.dir}/copynativelibs.sh">
-            cp -a ${native.build.dir}/* ${native.assembly.lib.dir}/${native.build.platform}
+            cp -PR ${native.build.dir}/* ${native.assembly.lib.dir}/${native.build.platform}
         </echo>
         <exec executable="sh" dir="${maven.build.dir}" failonerror="true">
             <arg line="./copynativelibs.sh"/>
