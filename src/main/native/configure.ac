@@ -55,7 +55,7 @@ JNI_LDFLAGS="-L$JAVA_HOME/jre/lib/$OS_ARCH/server"
 fi
 ldflags_bak=$LDFLAGS
 LDFLAGS="$LDFLAGS $JNI_LDFLAGS"
-AC_CHECK_LIB([jvm], [JNI_GetCreatedJavaVMs])
+AC_CHECK_LIB([jvm], [JNI_GetCreatedJavaVMs], [snappy])
 LDFLAGS=$ldflags_bak
 AC_SUBST([JNI_LDFLAGS])
 
