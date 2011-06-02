@@ -166,7 +166,7 @@
                                         <file file="${snappy.lib}/libsnappy.${nativelib.ext}"/>
                                     </resourceexists>
                                 </condition>
-                                <fail unless="snappy.found">Snappy native library not found at ${snappy.lib}, use -Dsnappy.path=PATH</fail>
+                                <fail unless="snappy.found">Snappy native library not found at ${snappy.lib}, use -Dsnappy.prefix=PATH</fail>
 
                                 <property name="native.compile" value="true"/>
                                 <property name="native.configure.options"
