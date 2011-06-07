@@ -85,8 +85,7 @@ public class SnappyCodec implements Configurable, CompressionCodec {
     int bufferSize = conf.getInt(SNAPPY_BUFFER_SIZE_KEY,
         DEFAULT_SNAPPY_BUFFER_SIZE);
 
-    int compressionOverhead = (bufferSize >> 3) + 128 + 3;
-    // int compressionOverhead = 0;
+    int compressionOverhead = (bufferSize / 6) + 32;
 
     return new BlockCompressorStream(out, compressor, bufferSize,
         compressionOverhead);
