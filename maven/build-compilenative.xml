@@ -92,6 +92,7 @@
             <env key="OS_NAME" value="${os.name}"/>
             <env key="OS_ARCH" value="${os.arch}"/>
             <env key="JVM_DATA_MODEL" value="${sun.arch.data.model}"/>
+            <env key="HADOOP_NATIVE_SRCDIR" value="${basedir}/src/main/native"/>
             <arg line="install DESTDIR=${native.build.dir} ${native.make.options}"/>
         </exec>
     </target>

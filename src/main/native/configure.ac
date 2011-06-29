@@ -21,7 +21,7 @@
 
 AC_PREREQ(2.59)
 AC_INIT(hadoop-snappy, 0.0.1, issaymk2@gmail.com)
-AC_CONFIG_SRCDIR([src/SnappyCompressor.cc])
+AC_CONFIG_SRCDIR([src/org_apache_hadoop.h])
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADER([config.h])
@@ -29,18 +29,17 @@ AC_SYS_LARGEFILE
 AM_INIT_AUTOMAKE([subdir-objects foreign no-dist])
 
 # Checks for programs.
-AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_LIBTOOL
+AM_PROG_CC_C_O
 
 # Checks for libraries.
+AC_CHECK_LIB([dl], [dlopen])
 
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([stdio.h stddef.h], [], AC_MSG_ERROR(Some system headers not found... please ensure their presence on your platform.))
-AC_LANG_PUSH([C++])
-AC_CHECK_HEADERS([snappy.h], [], AC_MSG_ERROR([Native snappy headers not found.]))
-AC_LANG_POP([C++])
+AC_CHECK_HEADERS([snappy-c.h], AC_COMPUTE_NEEDED_DSO(snappy,HADOOP_SNAPPY_LIBRARY), AC_MSG_ERROR([Native snappy headers not found.]))
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -55,7 +54,7 @@ JNI_LDFLAGS="-L$JAVA_HOME/jre/lib/$OS_ARCH/server"
 fi
 ldflags_bak=$LDFLAGS
 LDFLAGS="$LDFLAGS $JNI_LDFLAGS"
-AC_CHECK_LIB([jvm], [JNI_GetCreatedJavaVMs], [snappy])
+AC_CHECK_LIB([jvm], [JNI_GetCreatedJavaVMs])
 LDFLAGS=$ldflags_bak
 AC_SUBST([JNI_LDFLAGS])
 
