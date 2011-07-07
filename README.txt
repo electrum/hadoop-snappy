@@ -2,8 +2,12 @@ Hadoop-Snappy enables Snappy compression for Hadoop.
 
   http://code.google.com/p/hadoop-snappy/
 
-This project is preparing to integrate the code into Hadoop Common.
+This project is integrated into Hadoop Common (JUN 2011).
 
+Hadoop-Snappy can be used as an add-on for recent (released) versions
+of Hadoop that do not provide Snappy Codec support yet.
+
+Hadoop-Snappy is being kept in synch with Hadoop Common.
 
 Build Hadoop Snappy
 =====

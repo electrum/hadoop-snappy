@@ -32,12 +32,12 @@ import org.apache.hadoop.io.compress.Compressor;
  * http://code.google.com/p/snappy/
  */
 public class SnappyCompressor implements Compressor {
-  private static final Log LOG = 
-    LogFactory.getLog(SnappyCompressor.class.getName());
+  private static final Log LOG =
+      LogFactory.getLog(SnappyCompressor.class.getName());
   private static final int DEFAULT_DIRECT_BUFFER_SIZE = 64 * 1024;
 
   // HACK - Use this as a global lock in the JNI layer
-  @SuppressWarnings({ "unchecked", "unused" })
+  @SuppressWarnings({"unchecked", "unused"})
   private static Class clazz = SnappyCompressor.class;
 
   private int directBufferSize;
@@ -51,38 +51,25 @@ public class SnappyCompressor implements Compressor {
   private long bytesRead = 0L;
   private long bytesWritten = 0L;
 
-  private static boolean nativeSnappyLoaded = false;
 
   static {
-    if (SnappyNativeCodeLoader.isNativeCodeLoaded()) {
+    if (LoadSnappy.isLoaded()) {
       // Initialize the native library
       try {
         initIDs();
-        nativeSnappyLoaded = true;
       } catch (Throwable t) {
         // Ignore failure to load/initialize snappy
         LOG.warn(t.toString());
-        nativeSnappyLoaded = false;
       }
     } else {
-      LOG.error("Cannot load " + SnappyCompressor.class.getName() + 
-      " without snappy library!");
-      nativeSnappyLoaded = false;
+      LOG.error("Cannot load " + SnappyCompressor.class.getName() +
+          " without snappy library!");
     }
-  }
-  
-  /**
-   * Are the snappy compressors initialized? 
-   * 
-   * @return true if initialized, otherwise false
-   */
-  public static boolean isNativeSnappyLoaded() {
-    return nativeSnappyLoaded;
   }
 
   /**
    * Creates a new compressor.
-   * 
+   *
    * @param directBufferSize size of the direct buffer to be used.
    */
   public SnappyCompressor(int directBufferSize) {
@@ -100,7 +87,17 @@ public class SnappyCompressor implements Compressor {
     this(DEFAULT_DIRECT_BUFFER_SIZE);
   }
 
-  public void setInput(byte[] b, int off, int len) {
+  /**
+   * Sets input data for compression.
+   * This should be called whenever #needsInput() returns
+   * <code>true</code> indicating that more input data is required.
+   *
+   * @param b   Input data
+   * @param off Start offset
+   * @param len Length
+   */
+  @Override
+  public synchronized void setInput(byte[] b, int off, int len) {
     if (b == null) {
       throw new NullPointerException();
     }
@@ -121,13 +118,13 @@ public class SnappyCompressor implements Compressor {
 
     bytesRead += len;
   }
-  
+
   /**
    * If a write would exceed the capacity of the direct buffers, it is set
    * aside to be loaded by this function while the compressed data are
    * consumed.
    */
-  void setInputFromSavedData() {
+  synchronized void setInputFromSavedData() {
     if (0 >= userBufLen) {
       return;
     }
@@ -142,25 +139,62 @@ public class SnappyCompressor implements Compressor {
     userBufLen -= uncompressedDirectBufLen;
   }
 
-  public void setDictionary(byte[] b, int off, int len) {
+  /**
+   * Does nothing.
+   */
+  @Override
+  public synchronized void setDictionary(byte[] b, int off, int len) {
     // do nothing
   }
 
-  public boolean needsInput() {
+  /**
+   * Returns true if the input data buffer is empty and
+   * #setInput() should be called to provide more input.
+   *
+   * @return <code>true</code> if the input data buffer is empty and
+   *         #setInput() should be called in order to provide more input.
+   */
+  @Override
+  public synchronized boolean needsInput() {
     return !(compressedDirectBuf.remaining() > 0
         || uncompressedDirectBuf.remaining() == 0 || userBufLen > 0);
   }
 
-  public void finish() {
+  /**
+   * When called, indicates that compression should end
+   * with the current contents of the input buffer.
+   */
+  @Override
+  public synchronized void finish() {
     finish = true;
   }
 
-  public boolean finished() {
+  /**
+   * Returns true if the end of the compressed
+   * data output stream has been reached.
+   *
+   * @return <code>true</code> if the end of the compressed
+   *         data output stream has been reached.
+   */
+  @Override
+  public synchronized boolean finished() {
     // Check if all uncompressed data has been consumed
     return (finish && finished && compressedDirectBuf.remaining() == 0);
   }
 
-  public int compress(byte[] b, int off, int len)
+  /**
+   * Fills specified buffer with compressed data. Returns actual number
+   * of bytes of compressed data. A return value of 0 indicates that
+   * needsInput() should be called in order to determine if more input
+   * data is required.
+   *
+   * @param b   Buffer for the compressed data
+   * @param off Start offset of the data
+   * @param len Size of the buffer
+   * @return The actual number of bytes of compressed data.
+   */
+  @Override
+  public synchronized int compress(byte[] b, int off, int len)
       throws IOException {
     if (b == null) {
       throw new NullPointerException();
@@ -209,7 +243,11 @@ public class SnappyCompressor implements Compressor {
     return n;
   }
 
-  public void reset() {
+  /**
+   * Resets compressor so that a new set of input data can be processed.
+   */
+  @Override
+  public synchronized void reset() {
     finish = false;
     finished = false;
     uncompressedDirectBuf.clear();
@@ -220,25 +258,37 @@ public class SnappyCompressor implements Compressor {
     bytesRead = bytesWritten = 0L;
   }
 
-  public void reinit(Configuration conf) {
+  /**
+   * Prepare the compressor to be used in a new stream with settings defined in
+   * the given Configuration
+   *
+   * @param conf Configuration from which new setting are fetched
+   */
+  public synchronized void reinit(Configuration conf) {
     reset();
   }
-  
+
   /**
    * Return number of bytes given to this compressor since last reset.
    */
-  public long getBytesRead() {
+  @Override
+  public synchronized long getBytesRead() {
     return bytesRead;
   }
-  
+
   /**
    * Return number of bytes consumed by callers of compress since last reset.
    */
-  public long getBytesWritten() {
+  @Override
+  public synchronized long getBytesWritten() {
     return bytesWritten;
   }
 
-  public void end() {
+  /**
+   * Closes the compressor and discards any unprocessed input.
+   */
+  @Override
+  public synchronized void end() {
   }
 
   private native static void initIDs();

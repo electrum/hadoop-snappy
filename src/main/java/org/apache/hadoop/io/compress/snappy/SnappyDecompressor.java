@@ -31,12 +31,12 @@ import org.apache.hadoop.io.compress.Decompressor;
  * http://code.google.com/p/snappy/
  */
 public class SnappyDecompressor implements Decompressor {
-  private static final Log LOG = 
-    LogFactory.getLog(SnappyCompressor.class.getName());
+  private static final Log LOG =
+      LogFactory.getLog(SnappyCompressor.class.getName());
   private static final int DEFAULT_DIRECT_BUFFER_SIZE = 64 * 1024;
-  
+
   // HACK - Use this as a global lock in the JNI layer
-  @SuppressWarnings({ "unchecked", "unused" })
+  @SuppressWarnings({"unchecked", "unused"})
   private static Class clazz = SnappyDecompressor.class;
 
   private int directBufferSize;
@@ -47,38 +47,24 @@ public class SnappyDecompressor implements Decompressor {
   private int userBufOff = 0, userBufLen = 0;
   private boolean finished;
 
-  private static boolean nativeSnappyLoaded = false;
-
   static {
-    if (SnappyNativeCodeLoader.isNativeCodeLoaded()) {
+    if (LoadSnappy.isLoaded()) {
       // Initialize the native library
       try {
         initIDs();
-        nativeSnappyLoaded = true;
       } catch (Throwable t) {
         // Ignore failure to load/initialize snappy
         LOG.warn(t.toString());
-        nativeSnappyLoaded = false;
       }
     } else {
-      LOG.error("Cannot load " + SnappyDecompressor.class.getName() + 
-      " without snappy library!");
-      nativeSnappyLoaded = false;
+      LOG.error("Cannot load " + SnappyDecompressor.class.getName() +
+          " without snappy library!");
     }
   }
-  
-  /**
-   * Are the snappy decompressors initialized? 
-   * 
-   * @return true if initialized, otherwise false
-   */
-  public static boolean isNativeSnappyLoaded() {
-    return nativeSnappyLoaded;
-  }
-  
+
   /**
    * Creates a new compressor.
-   * 
+   *
    * @param directBufferSize size of the direct buffer to be used.
    */
   public SnappyDecompressor(int directBufferSize) {
@@ -89,7 +75,7 @@ public class SnappyDecompressor implements Decompressor {
     uncompressedDirectBuf.position(directBufferSize);
 
   }
-  
+
   /**
    * Creates a new decompressor with the default buffer size.
    */
@@ -97,7 +83,22 @@ public class SnappyDecompressor implements Decompressor {
     this(DEFAULT_DIRECT_BUFFER_SIZE);
   }
 
-  public void setInput(byte[] b, int off, int len) {
+  /**
+   * Sets input data for decompression.
+   * This should be called if and only if {@link #needsInput()} returns
+   * <code>true</code> indicating that more input data is required.
+   * (Both native and non-native versions of various Decompressors require
+   * that the data passed in via <code>b[]</code> remain unmodified until
+   * the caller is explicitly notified--via {@link #needsInput()}--that the
+   * buffer may be safely modified.  With this requirement, an extra
+   * buffer-copy can be avoided.)
+   *
+   * @param b   Input data
+   * @param off Start offset
+   * @param len Length
+   */
+  @Override
+  public synchronized void setInput(byte[] b, int off, int len) {
     if (b == null) {
       throw new NullPointerException();
     }
@@ -115,13 +116,13 @@ public class SnappyDecompressor implements Decompressor {
     uncompressedDirectBuf.limit(directBufferSize);
     uncompressedDirectBuf.position(directBufferSize);
   }
-  
+
   /**
    * If a write would exceed the capacity of the direct buffers, it is set
    * aside to be loaded by this function while the compressed data are
    * consumed.
    */
-  void setInputFromSavedData() {
+  synchronized void setInputFromSavedData() {
     compressedDirectBufLen = Math.min(userBufLen, directBufferSize);
 
     // Reinitialize snappy's input direct buffer
@@ -134,11 +135,25 @@ public class SnappyDecompressor implements Decompressor {
     userBufLen -= compressedDirectBufLen;
   }
 
-  public void setDictionary(byte[] b, int off, int len) {
+  /**
+   * Does nothing.
+   */
+  @Override
+  public synchronized void setDictionary(byte[] b, int off, int len) {
     // do nothing
   }
 
-  public boolean needsInput() {
+  /**
+   * Returns true if the input data buffer is empty and
+   * {@link #setInput(byte[], int, int)} should be called to
+   * provide more input.
+   *
+   * @return <code>true</code> if the input data buffer is empty and
+   *         {@link #setInput(byte[], int, int)} should be called in
+   *         order to provide more input.
+   */
+  @Override
+  public synchronized boolean needsInput() {
     // Consume remaining compressed data?
     if (uncompressedDirectBuf.remaining() > 0) {
       return false;
@@ -157,15 +172,42 @@ public class SnappyDecompressor implements Decompressor {
     return false;
   }
 
-  public boolean needsDictionary() {
+  /**
+   * Returns <code>false</code>.
+   *
+   * @return <code>false</code>.
+   */
+  @Override
+  public synchronized boolean needsDictionary() {
     return false;
   }
 
-  public boolean finished() {
+  /**
+   * Returns true if the end of the decompressed
+   * data output stream has been reached.
+   *
+   * @return <code>true</code> if the end of the decompressed
+   *         data output stream has been reached.
+   */
+  @Override
+  public synchronized boolean finished() {
     return (finished && uncompressedDirectBuf.remaining() == 0);
   }
 
-  public int decompress(byte[] b, int off, int len)
+  /**
+   * Fills specified buffer with uncompressed data. Returns actual number
+   * of bytes of uncompressed data. A return value of 0 indicates that
+   * {@link #needsInput()} should be called in order to determine if more
+   * input data is required.
+   *
+   * @param b   Buffer for the compressed data
+   * @param off Start offset of the data
+   * @param len Size of the buffer
+   * @return The actual number of bytes of compressed data.
+   * @throws IOException
+   */
+  @Override
+  public synchronized int decompress(byte[] b, int off, int len)
       throws IOException {
     if (b == null) {
       throw new NullPointerException();
@@ -191,20 +233,25 @@ public class SnappyDecompressor implements Decompressor {
       // Decompress data
       n = decompressBytesDirect();
       uncompressedDirectBuf.limit(n);
-      
+
       if (userBufLen <= 0) {
         finished = true;
       }
-      
+
       // Get atmost 'len' bytes
       n = Math.min(n, len);
       ((ByteBuffer) uncompressedDirectBuf).get(b, off, n);
     }
-    
+
     return n;
   }
 
-  public void reset() {
+  /**
+   * Resets decompressor and input and output buffers so that a new set of
+   * input data can be processed.
+   */
+  @Override
+  public synchronized void reset() {
     finished = false;
     compressedDirectBufLen = 0;
     uncompressedDirectBuf.limit(directBufferSize);
@@ -212,12 +259,12 @@ public class SnappyDecompressor implements Decompressor {
     userBufOff = userBufLen = 0;
   }
 
-  public void end() {
+  /**
+   * Closes the decompressor and discards any unprocessed input.
+   */
+  @Override
+  public synchronized void end() {
     // do nothing
-  }
-
-  protected void finalize() {
-    end();
   }
 
   private native static void initIDs();
