@@ -60,18 +60,9 @@ static snappy_status (*dlsym_snappy_compress)(const char*, size_t, char*, size_t
 JNIEXPORT void JNICALL Java_org_apache_hadoop_io_compress_snappy_SnappyCompressor_initIDs
 (JNIEnv *env, jclass clazz){
 
-  // Load libsnappy.so
-  void *libsnappy = dlopen(HADOOP_SNAPPY_LIBRARY, RTLD_LAZY | RTLD_GLOBAL);
-  if (!libsnappy) {
-    char* msg = (char*)malloc(1000);
-    snprintf(msg, 1000, "%s (%s)!", "Cannot load " HADOOP_SNAPPY_LIBRARY, dlerror());
-    THROW(env, "java/lang/UnsatisfiedLinkError", msg);
-    return;
-  }
-
   // Locate the requisite symbols from libsnappy.so
   dlerror();                                 // Clear any existing error
-  LOAD_DYNAMIC_SYMBOL(dlsym_snappy_compress, env, libsnappy, "snappy_compress");
+  LOAD_DYNAMIC_SYMBOL(dlsym_snappy_compress, env, RTLD_DEFAULT, "snappy_compress");
 
   SnappyCompressor_clazz = (*env)->GetStaticFieldID(env, clazz, "clazz",
                                                  "Ljava/lang/Class;");

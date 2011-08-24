@@ -47,27 +47,17 @@ public class SnappyDecompressor implements Decompressor {
   private int userBufOff = 0, userBufLen = 0;
   private boolean finished;
 
-  static {
-    if (LoadSnappy.isLoaded()) {
-      // Initialize the native library
-      try {
-        initIDs();
-      } catch (Throwable t) {
-        // Ignore failure to load/initialize snappy
-        LOG.warn(t.toString());
-      }
-    } else {
-      LOG.error("Cannot load " + SnappyDecompressor.class.getName() +
-          " without snappy library!");
-    }
-  }
-
   /**
    * Creates a new compressor.
    *
    * @param directBufferSize size of the direct buffer to be used.
    */
   public SnappyDecompressor(int directBufferSize) {
+    // The JVM crashes if the library is not loaded
+    if (!LoadSnappy.isLoaded()) {
+      throw new RuntimeException("native snappy library not available");
+    }
+
     this.directBufferSize = directBufferSize;
 
     compressedDirectBuf = ByteBuffer.allocateDirect(directBufferSize);
@@ -267,7 +257,7 @@ public class SnappyDecompressor implements Decompressor {
     // do nothing
   }
 
-  private native static void initIDs();
+  native static void initIDs();
 
   private native int decompressBytesDirect();
 }

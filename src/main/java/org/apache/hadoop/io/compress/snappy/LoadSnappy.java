@@ -19,7 +19,6 @@ package org.apache.hadoop.io.compress.snappy;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.util.NativeCodeLoader;
 
 /**
  * Determines if Snappy native library is available and loads it if available.
@@ -27,34 +26,30 @@ import org.apache.hadoop.util.NativeCodeLoader;
 public class LoadSnappy {
   private static final Log LOG = LogFactory.getLog(LoadSnappy.class.getName());
 
-  private static boolean AVAILABLE = false;
   private static boolean LOADED = false;
 
   static {
     try {
       System.loadLibrary("snappy");
       System.loadLibrary("hadoopsnappy");
-      LOG.warn("Snappy native library is available");
-      AVAILABLE = true;
+
+      // Initialize the native library. This causes hadoopsnappy to
+      // dynamically load the symbols from the native snappy library.
+      // If this fails, the library can't be used, and attempting to
+      // use it will cause the JVM to crash.
+      SnappyCompressor.initIDs();
+      SnappyDecompressor.initIDs();
+
+      LOADED = true;
     } catch (UnsatisfiedLinkError ex) {
-      //NOP
+      LOG.warn("Failed to load library from " +
+          System.getProperty("java.library.path") + ": " + ex.getMessage());
     }
-    LOADED = AVAILABLE;
     if (LOADED) {
       LOG.info("Snappy native library loaded");
     } else {
       LOG.warn("Snappy native library not loaded");
     }
-  }
-
-  /**
-   * Returns if Snappy native library is loaded.
-   *
-   * @return <code>true</code> if Snappy native library is loaded,
-   * <code>false</code> if not.
-   */
-  public static boolean isAvailable() {
-    return AVAILABLE;
   }
 
   /**
