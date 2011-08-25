@@ -275,7 +275,7 @@
                 </os>
             </activation>
             <properties>
-                <build.platform>Mac_OS_X-${sun.arch.data.model}</build.platform>
+                <build.platform>Mac_OS_X-${os.arch}-${sun.arch.data.model}</build.platform>
                 <nativelib.ext>dylib</nativelib.ext>
             </properties>
         </profile>
