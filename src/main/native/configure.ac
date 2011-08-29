@@ -26,7 +26,7 @@ AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADER([config.h])
 AC_SYS_LARGEFILE
-AM_INIT_AUTOMAKE([subdir-objects foreign no-dist])
+AM_INIT_AUTOMAKE([subdir-objects foreign])
 
 # Checks for programs.
 AC_PROG_CC
