@@ -30,10 +30,10 @@ extern "C" {
 /*
  * Class:     org_apache_hadoop_io_compress_snappy_SnappyCompressor
  * Method:    initIDs
- * Signature: ()V
+ * Signature: (Ljava/lang/String;)V
  */
 JNIEXPORT void JNICALL Java_org_apache_hadoop_io_compress_snappy_SnappyCompressor_initIDs
-  (JNIEnv *, jclass);
+  (JNIEnv *, jclass, jstring);
 
 /*
  * Class:     org_apache_hadoop_io_compress_snappy_SnappyCompressor

@@ -17,6 +17,8 @@
  */
 package org.apache.hadoop.io.compress.snappy;
 
+import java.io.File;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -33,12 +35,15 @@ public class LoadSnappy {
       System.loadLibrary("snappy");
       System.loadLibrary("hadoopsnappy");
 
+      // Find the path to the native library
+      String snappyPath = findLibrary("snappy");
+
       // Initialize the native library. This causes hadoopsnappy to
       // dynamically load the symbols from the native snappy library.
       // If this fails, the library can't be used, and attempting to
       // use it will cause the JVM to crash.
-      SnappyCompressor.initIDs();
-      SnappyDecompressor.initIDs();
+      SnappyCompressor.initIDs(snappyPath);
+      SnappyDecompressor.initIDs(snappyPath);
 
       LOADED = true;
     } catch (UnsatisfiedLinkError ex) {
@@ -50,6 +55,18 @@ public class LoadSnappy {
     } else {
       LOG.warn("Snappy native library not loaded");
     }
+  }
+
+  private static String findLibrary(String name) {
+    name = System.mapLibraryName(name).replace(".jnilib", ".dylib");
+    String paths[] = System.getProperty("java.library.path").split(":");
+    for (String path : paths) {
+      File file = new File(path, name);
+      if (file.exists()) {
+        return file.toString();
+      }
+    }
+    throw new UnsatisfiedLinkError("cannot find path to " + name);
   }
 
   /**

@@ -257,7 +257,7 @@ public class SnappyDecompressor implements Decompressor {
     // do nothing
   }
 
-  native static void initIDs();
+  native static void initIDs(String snappyPath);
 
   private native int decompressBytesDirect();
 }

@@ -281,7 +281,7 @@ public class SnappyCompressor implements Compressor {
   public synchronized void end() {
   }
 
-  native static void initIDs();
+  native static void initIDs(String snappyPath);
 
   private native int compressBytesDirect();
 }
