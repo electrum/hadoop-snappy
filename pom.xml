@@ -251,12 +251,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <forkMode>once</forkMode>
-                    <environmentVariables>
-                        <LD_LIBRARY_PATH>${env.LD_LIBRARY_PATH}:${snappy.lib}:${project.build.directory}/native-build/usr/local/lib</LD_LIBRARY_PATH>
-
-                        <!-- For Mac OS X -->
-                        <DYLD_LIBRARY_PATH>${env.DYLD_LIBRARY_PATH}:${snappy.lib}:${project.build.directory}/native-build/usr/local/lib</DYLD_LIBRARY_PATH>
-                    </environmentVariables>
+                    <argLine>-Djava.library.path=${snappy.lib}:${project.build.directory}/native-build/usr/local/lib</argLine>
                     <excludes>
                         <exclude>**/${test.exclude}.java</exclude>
                         <exclude>${test.exclude.pattern}</exclude>
