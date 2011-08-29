@@ -218,6 +218,15 @@
                                     <arg value="${project.build.directory}/${project.artifactId}-${project.version}-${build.platform}.tar"/>
                                     <arg value="."/>
                                 </exec>
+
+                                <!-- Create tarball ready for extraction into Hadoop lib directory -->
+                                <exec executable="tar"
+                                      dir="${project.build.directory}/${project.artifactId}-${project.version}-tar/${project.artifactId}-${project.version}/lib"
+                                      failonerror="yes">
+                                    <arg value="czf"/>
+                                    <arg value="${project.build.directory}/${project.artifactId}-${build.platform}.tar.gz"/>
+                                    <arg value="."/>
+                                </exec>
                             </target>
                         </configuration>
                     </execution>
