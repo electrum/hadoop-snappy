@@ -24,4 +24,4 @@ AM_CFLAGS = -g -Wall -fPIC -O2 -m$(JVM_DATA_MODEL)
 lib_LTLIBRARIES = libhadoopsnappy.la
 
 libhadoopsnappy_la_SOURCES = src/org/apache/hadoop/io/compress/snappy/SnappyCompressor.c src/org/apache/hadoop/io/compress/snappy/SnappyDecompressor.c
-libhadoopsnappy_la_LDFLAGS = -version-info 0:1:0
+libhadoopsnappy_la_LDFLAGS = $(AM_LDFLAGS) -version-info 0:1:0
